@@ -14,11 +14,9 @@ module.exports = (sequelize, Sequelize) => {
         id_restaurante: {
             type: Sequelize.INTEGER,
             references: {
-                // This is a reference to another model
-                model: Restaurante,
-                // This is the column name of the referenced model
+                model: 'Restaurantes',
                 key: 'id'
-            },
+            }
         },
         posicion_x: {
             type: Sequelize.INTEGER,

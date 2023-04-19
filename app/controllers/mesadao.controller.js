@@ -4,7 +4,7 @@ const Op = db.Sequelize.Op;
 exports.create = (req, res) => {
     // crea una mesa
     const mesa = {
-        nombre: req.body.nombre,
+        nombre_mesa: req.body.nombre_mesa,
         id_restaurante: req.body.id_restaurante,
         posicion_x: req.body.posicion_x,
         posicion_y: req.body.posicion_y,
@@ -25,49 +25,37 @@ exports.create = (req, res) => {
 };
 
 exports.findAll = (req, res) => {
-    const nombre_mesa = req.query.nombre_mesa;
-    var condition = nombre_mesa ? { nombre_mesa: { [Op.iLike]: `%${nombre_mesa}%` } } : null;
-  
-    Mesa.findAll({
-      where: condition,
-      include: [
-        {
-          model: Restaurante,
-          attributes: ['nombre', 'direccion'],
-        },
-      ],
-    })
+    Mesa.findAll()
       .then(data => {
         res.send(data);
       })
       .catch(err => {
         res.status(500).send({
           message:
-            err.message || 'Ocurrió un error al obtener las mesas.'
+            err.message || "Ocurrió un error al obtener las mesas."
         });
       });
   };
-
   exports.findOne = (req, res) => {
     const id = req.params.id;
   
-    Mesa.findByPk(id, {
-      include: [
-        {
-          model: Restaurante,
-          attributes: ['nombre', 'direccion'],
-        },
-      ],
-    })
+    Mesa.findByPk(id)
       .then(data => {
-        res.send(data);
+        if (!data) {
+          res.status(404).send({
+            message: `No se encontró la mesa con id=${id}.`
+          });
+        } else {
+          res.send(data);
+        }
       })
       .catch(err => {
         res.status(500).send({
-          message: 'Error al obtener la mesa con id=' + id
+          message: "Error al obtener la mesa con id=" + id
         });
       });
   };
+  
 exports.update = (req, res) => {
     const id = req.params.id;
     Mesa.update(req.body, {
@@ -104,7 +92,7 @@ exports.update = (req, res) => {
           });
         } else {
           res.send({
-            message: `No se pudo eliminar la mesa con id=${id}. Tal vez la mesa no fue encontrado.`
+            message: 'No se pudo eliminar la mesa con id=${id}. Tal vez la mesa no fue encontrado.'
           });
         }
       })
