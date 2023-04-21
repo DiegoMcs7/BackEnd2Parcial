@@ -1,3 +1,5 @@
+const models = require("../models");
+
 module.exports = (sequelize, Sequelize) => {
     const Restaurante = sequelize.define('Restaurante', {
         id: {
@@ -14,7 +16,8 @@ module.exports = (sequelize, Sequelize) => {
           allowNull: false,
         },
       });
-    
-    return Restaurante;
+
+
+     return Restaurante;
     
 };

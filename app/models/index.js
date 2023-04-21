@@ -19,4 +19,12 @@ db.Restaurante = require("./restaurante.model.js")(sequelize, Sequelize);
 db.Mesa = require("./mesa.model.js")(sequelize, Sequelize);
 db.Cliente = require("./cliente.model.js")(sequelize, Sequelize);
 
+db.Restaurante.hasMany(db.Mesa,{
+        foreignKey: 'id_restaurante'
+})
+
+db.Mesa.belongsTo(db.Restaurante,{
+    foreignKey: 'id_restaurante'
+})
+
 module.exports = db;

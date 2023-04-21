@@ -1,4 +1,7 @@
 const db = require("../models");
+
+const { Restaurante } = require('../models/restaurante.model.js');
+
 const Mesa = db.Mesa;
 const Op = db.Sequelize.Op;
 exports.create = (req, res) => {
@@ -25,17 +28,41 @@ exports.create = (req, res) => {
 };
 
 exports.findAll = (req, res) => {
-    Mesa.findAll()
-      .then(data => {
-        res.send(data);
-      })
-      .catch(err => {
-        res.status(500).send({
-          message:
-            err.message || "Ocurrió un error al obtener las mesas."
-        });
+  Mesa.findAll({
+    include: [{
+      model: db.Restaurante,
+    }]
+  })
+    .then(data => {
+      res.send(data);
+    })
+    .catch(err => {
+      res.status(500).send({
+        message:
+          err.message || "Ocurrió un error al obtener las mesas.",
       });
-  };
+    });
+};
+
+
+// exports.findAll = (req, res) => {
+//   Mesa.findAll({
+//     include: {
+//       model: Restaurante,      
+//       required: true // this specifies that it's an inner join
+
+//     }
+//   })
+//     .then(data => {
+//       res.send(data);
+//     })
+//     .catch(err => {
+//       res.status(500).send({
+//         message:
+//           err.message || "Ocurrió un error al obtener las mesas."
+//       });
+//     });
+// };
   exports.findOne = (req, res) => {
     const id = req.params.id;
   
