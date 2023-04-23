@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<meta charset="utf-8">
+<title>Page Title</title>
+
+<body>
+    <h1>Lista Mesas</h1>
+<table align="left" border="4">
+    <tr> 
+        <th>MESA</th>
+        <th>RESTAURANTE</th>
+        <th>POS_X</th>
+        <th>POS_Y</th>
+        <th>PLANTA</th>
+        <th>CAPACIDAD</th>  
+    </tr>
+    <% for(let i = 0; i < mesas.length; i++) { %>
+    <tr>
+        <td><%= mesas[i].nombre_mesa %></td>
+        <td><%= mesas[i].id_restaurante %></td>
+        <td><%= mesas[i].posicion_x %></td>
+        <td><%= mesas[i].posicion_y %></td>
+        <td><%= mesas[i].planta %></td>
+        <td><%= mesas[i].capacidad %></td>
+    </tr>
+    <% } %>
+    
+</table>
+</body>
+</html>

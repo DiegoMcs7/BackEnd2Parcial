@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<meta charset="utf-8">
+<title>Page Title</title>
+
+<body>
+    <h1>Lista Clientes</h1>
+<table align="left" border="4">
+    <tr> 
+        <th>CLIENTE</th>
+        <th>CEDULA</th> 
+    </tr>
+    <% for(let i = 0; i < clientes.length; i++) { %>
+    <tr>
+        <td><%= clientes[i].nombre %></td>
+        <td><%= clientes[i].ci %></td>
+    </tr>
+    <% } %>
+    
+</table>
+</body>
+</html>

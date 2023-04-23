@@ -13,27 +13,27 @@ const horas = [
     { id: 6, rango: '21 a 22' },
     { id: 7, rango: '22 a 23' }
 ];
+
 exports.create = (req, res) => {
-    // crea una reserva
     const reserva = {
         id_restaurante: req.body.id_restaurante,
         id_mesa: req.body.id_mesa,
         fecha: req.body.fecha,
-        hora: req.body.hora,
         id_cliente: req.body.id_cliente,
         cantidad: req.body.cantidad,
     };
-    function buscarHoraPorId(id) {
-        console.log(horas.find(hora => hora.id === id));
-        return horas.find(hora => hora.id === id);
+    
+    function buscarHoraPorIds(ids) {
+        if (ids === undefined) {
+            return [];
+        }
+        return ids.map(id => horas.find(hora => hora.id === id)?.rango);
     }
+      
+    const hora = buscarHoraPorIds(req.body.hora);
+    reserva.hora = hora.join(', '); // unimos las horas seleccionadas en una cadena de texto separada por comas
 
-    const idHoraSeleccionada = req.body.hora;
-    const horaSeleccionada = buscarHoraPorId(idHoraSeleccionada);
-    const hora = horaSeleccionada.rango;
-    console.log(hora);
-    // Guardamos a la base de datos
-    Reserva.create(reserva,hora)
+    Reserva.create(reserva)
         .then(data => {
             res.send(data);
         })
@@ -41,9 +41,10 @@ exports.create = (req, res) => {
             res.status(500).send({
                 message:
                     err.message || "Ha ocurrido un error al crear la reserva."
+            });
         });
-    });
 };
+
 
 exports.findAll = (req, res) => {
     Reserva.findAll({

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<meta charset="utf-8">
+<title>Page Title</title>
+
+<body>
+    <h1>Lista Restaurantes</h1>
+<table align="left" border="4">
+    <tr> 
+        <th>RESTAURANTE</th>
+        <th>DIRECCION</th> 
+    </tr>
+    <% for(let i = 0; i < restaurantes.length; i++) { %>
+    <tr>
+        <td><%= restaurantes[i].nombre %></td>
+        <td><%= restaurantes[i].direccion %></td>
+    </tr>
+    <% } %>
+    
+</table>
+</body>
+</html>
