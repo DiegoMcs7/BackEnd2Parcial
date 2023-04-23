@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<meta charset="utf-8">
+<title>Reservas</title>
+
+<body>
+    <h1>Lista de Reservas</h1>
+<table align="left" border="4">
+    <tr> 
+        <th>RESTAURANTE</th>
+        <th>MESA</th> 
+        <th>FECHA</th> 
+        <th>HORA</th> 
+        <th>CLIENTE</th> 
+        <th>CANTIDAD</th> 
+    </tr>
+    <% for(let i = 0; i < reservas.length; i++) { %>
+    <tr>
+        <td><%= reservas[i].Restaurante.nombre %></td>
+        <td><%= reservas[i].Mesa.nombre_mesa %></td>
+        <td><%= reservas[i].fecha %></td>
+        <td><%= reservas[i].hora %></td>
+        <td><%= reservas[i].Cliente.nombre%> <%= reservas[i].Cliente.apellido%> </td>
+        <td><%= reservas[i].cantidad %></td>
+    </tr>
+    <% } %>
+    
+</table>
+</body>
+</html>

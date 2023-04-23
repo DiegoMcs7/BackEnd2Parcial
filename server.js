@@ -22,7 +22,7 @@ app.set('views',path.join(__dirname + '/app/views'));
 app.use(express.static(__dirname + '/app/public'));  //en public los archivos css y js
 
 // simple route
-app.get("/clientes", (req, res) => {
+app.get("/cliente_list", (req, res) => {
     async function getCliente() {
         const clientes = await db.Cliente.findAll();
         const usersDataValues = clientes.map(clientes => clientes.dataValues);
@@ -31,12 +31,12 @@ app.get("/clientes", (req, res) => {
       
     // Utilizando .then()
     getCliente().then(clientes => {
-    res.render("cliente", {clientes: clientes});
+    res.render("cliente_list", {clientes: clientes});
 
   });
 });
 
-app.get("/restaurantes", (req, res) => {
+app.get("/restaurante_list", (req, res) => {
     async function getRestaurante() {
         const restaurantes = await db.Restaurante.findAll();
         const usersDataValues = restaurantes.map(restaurantes => restaurantes.dataValues);
@@ -45,7 +45,7 @@ app.get("/restaurantes", (req, res) => {
       
     // Utilizando .then()
     getRestaurante().then(restaurantes => {
-    res.render("restaurante", {restaurantes: restaurantes});
+    res.render("restaurante_list", {restaurantes: restaurantes});
 
   });
 });
@@ -55,11 +55,9 @@ app.get("/mesas", (req, res) => {
         const mesas = await db.Mesa.findAll({
             include: [{
               model: db.Restaurante,
+              attributes: ['nombre']
             }]
           });
-        const usersDataValues = mesas.map(mesas => mesas.dataValues);
-        console.log(usersDataValues);
-        return usersDataValues;
     }
       
     // Utilizando .then()
@@ -67,6 +65,81 @@ app.get("/mesas", (req, res) => {
     res.render("mesa", {mesas: mesas});
 
   });
+});
+
+app.get("/reservas_list", (req, res) => {
+    async function getReservas() {
+      const reservas = await db.Reserva.findAll({
+          include: [
+            { model: db.Restaurante, 
+              attributes: ['nombre']
+            },
+            { model: db.Mesa,
+              attributes: ['nombre_mesa']
+
+            },
+            { model: db.Cliente,
+              attributes: ['nombre', 'apellido']
+            }
+          ]
+        });
+        const usersDataValues = reservas.map(reservas => reservas.dataValues);
+        return usersDataValues;
+    }
+    getReservas().then(reservas => {
+      console.log(reservas);
+      res.render("reservas_list", {reservas: reservas});
+    });
+  });
+    
+
+
+  app.get("/reservas_create", (req, res) => {
+        async function getDatosReservas() {
+          const restaurantes = await db.Restaurante.findAll();
+          const mesas = await db.Mesa.findAll();
+          const clientes = await db.Cliente.findAll();
+          const usersDataValues = restaurantes.map(restaurantes => restaurantes.dataValues);
+          const usersDataValues1 = clientes.map(clientes => clientes.dataValues);
+          const usersDataValues2 = mesas.map(mesas => mesas.dataValues);
+          return { restaurantes: usersDataValues, clientes: usersDataValues1,mesas: usersDataValues2 };
+      }
+        
+        // Utilizando .then()
+        getDatosReservas().then((data) => {
+          console.log(data.mesas);
+          res.render("reservas_create", { restaurantes: data.restaurantes, mesas: data.mesas, clientes: data.clientes });
+        });
+       
+       
+  });
+
+
+  app.post("/reservas_create_post", (req, res) => {
+    async function postReservas() {
+        const reservas = await db.Reserva.findAll({
+            include: [
+              { model: db.Restaurante, 
+                attributes: ['nombre']
+              },
+              { model: db.Mesa,
+                attributes: ['nombre_mesa']
+  
+              },
+              { model: db.Cliente,
+                attributes: ['nombre', 'apellido']
+              }
+            ]
+          });
+        const usersDataValues = reservas.map(reservas => reservas.dataValues);
+        console.log(usersDataValues);
+        return usersDataValues;
+    }
+  // Utilizando .then()
+  postReservas().then(reservas => {
+  res.render("reservas_create_post", {reservas: reservas});
+
+});
 });
 
 require("./app/routes/restaurante.routes")(app);
