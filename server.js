@@ -50,7 +50,7 @@ app.get("/restaurante_list", (req, res) => {
   });
 });
 
-app.get("/mesas", (req, res) => {
+app.get("/mesa_list", (req, res) => {
     async function getMesas() {
         const mesas = await db.Mesa.findAll({
             include: [{
@@ -58,11 +58,13 @@ app.get("/mesas", (req, res) => {
               attributes: ['nombre']
             }]
           });
+        const usersDataValues = mesas.map(mesas => mesas.dataValues);
+        return usersDataValues;
     }
       
     // Utilizando .then()
     getMesas().then(mesas => {
-    res.render("mesa", {mesas: mesas});
+    res.render("mesa_list", {mesas: mesas});
 
   });
 });
@@ -92,8 +94,6 @@ app.get("/reservas_list", (req, res) => {
     });
   });
     
-
-
   app.get("/reservas_create", (req, res) => {
         async function getDatosReservas() {
           const restaurantes = await db.Restaurante.findAll();
