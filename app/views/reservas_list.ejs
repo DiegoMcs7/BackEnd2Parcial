@@ -2,30 +2,39 @@
 <html lang="en">
 
 <meta charset="utf-8">
+<head>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.4/css/jquery.dataTables.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+</head>
 <title>Reservas</title>
-
-<body>
+<body class="container-fluid">
     <h1>Lista de Reservas</h1>
-<table align="left" border="4">
-    <tr> 
-        <th>RESTAURANTE</th>
-        <th>MESA</th> 
-        <th>FECHA</th> 
-        <th>HORA</th> 
-        <th>CLIENTE</th> 
-        <th>CANTIDAD</th> 
-    </tr>
-    <% for(let i = 0; i < reservas.length; i++) { %>
-    <tr>
-        <td><%= reservas[i].Restaurante.nombre %></td>
-        <td><%= reservas[i].Mesa.nombre_mesa %></td>
-        <td><%= reservas[i].fecha %></td>
-        <td><%= reservas[i].hora %></td>
-        <td><%= reservas[i].Cliente.nombre%> <%= reservas[i].Cliente.apellido%> </td>
-        <td><%= reservas[i].cantidad %></td>
-    </tr>
-    <% } %>
-    
-</table>
-</body>
+        <table id="example" class="table table-striped" style="text-align: center;">
+            <thead>
+            <tr> 
+                <th>RESTAURANTE</th>
+                <th>MESA</th> 
+                <th>FECHA</th> 
+                <th>HORA</th> 
+                <th>CLIENTE</th> 
+                <th>CANTIDAD</th> 
+            </tr>
+        </thead>
+        <tbody>
+            <% for(let i = 0; i < reservas.length; i++) { %>
+            <tr>
+                <td><%= reservas[i].Restaurante.nombre %></td>
+                <td><%= reservas[i].Mesa.nombre_mesa %></td>
+                <td><%= reservas[i].fecha %></td>
+                <td><%= reservas[i].hora %></td>
+                <td><%= reservas[i].Cliente.nombre%> <%= reservas[i].Cliente.apellido%> </td>
+                <td><%= reservas[i].cantidad %></td>
+            </tr>
+            <% } %>
+        </tbody>
+        </table>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script type="text/javascript" src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
+        <script type="text/javascript" src="main.js"></script> 
+    </body>
 </html>
