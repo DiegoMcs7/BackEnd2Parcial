@@ -108,13 +108,9 @@ app.get("/reservas_list", (req, res) => {
         // Utilizando .then()
         getDatosReservas().then((data) => {
           console.log(data.mesas);
-          res.render("reservas_create", { restaurantes: data.restaurantes, mesas: data.mesas, clientes: data.clientes });
+          res.render("reservas_create", { restaurantes: data.restaurantes, mesas: data.mesas, clientes: data.clientes ,result:""});
         });
-       
-       
   });
-
-
   app.post("/reservas_create_post", (req, res) => {
     async function postReservas() {
         const reservas = await db.Reserva.findAll({
@@ -132,13 +128,17 @@ app.get("/reservas_list", (req, res) => {
             ]
           });
         const usersDataValues = reservas.map(reservas => reservas.dataValues);
-        console.log(usersDataValues);
-        return usersDataValues;
+        const restaurantes = await db.Restaurante.findAll();
+          const mesas = await db.Mesa.findAll();
+          const clientes = await db.Cliente.findAll();
+          const usersDataValues0 = restaurantes.map(restaurantes => restaurantes.dataValues);
+          const usersDataValues1 = clientes.map(clientes => clientes.dataValues);
+          const usersDataValues2 = mesas.map(mesas => mesas.dataValues);
+          return { usersDataValues,restaurantes: usersDataValues0, clientes: usersDataValues1,mesas: usersDataValues2 };
     }
   // Utilizando .then()
-  postReservas().then(reservas => {
-  res.render("reservas_create_post", {reservas: reservas});
-
+  postReservas().then(data => {
+    res.render("reservas_create", { reservas: data.reservas,result:"resultado",restaurantes: data.restaurantes, mesas: data.mesas, clientes: data.clientes});
 });
 });
 

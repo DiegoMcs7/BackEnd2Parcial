@@ -6,7 +6,7 @@ module.exports = (sequelize, Sequelize) => {
             autoIncrement: true
         },
         ci: {
-            type: Sequelize.BIGINT,
+            type: Sequelize.INTEGER,
             unique: true
         },
         nombre: {
