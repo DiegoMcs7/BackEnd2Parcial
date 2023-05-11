@@ -66,10 +66,8 @@ app.post("/clientes_create", (req, res) => {
     })
     .catch((err) => {
       console.log("no entra log");
-
       res.status(400).json({ message: err.message });
     });
-
 })
 
 
@@ -85,7 +83,6 @@ app.get("/restaurante_list", (req, res) => {
   // Utilizando .then()
   getRestaurante().then(restaurantes => {
     res.render("restaurante_list", { restaurantes: restaurantes });
-
   });
 });
 
@@ -126,14 +123,15 @@ app.get("/get_mesas_disponibles", (req, res) => {
 
   // Utilizando .then()
   getMesasDisponibles().then(mesasDisponibles => {
-    console.log(mesasDisponibles);
-    res.render("mesa_list_reservas", { mesas: mesasDisponibles });
+    console.log(req.query.hora );
+    res.render("mesa_list_reservas", { mesas: mesasDisponibles, restaurante: req.query.restaurante, 
+      fecha: req.query.fecha, hora: { [Op.in]: req.query.hora.split(',') },
+  });
   });
 });
 
 app.get("/cliente_list_json", (req, res) => {
   async function getClientes() {
-    console.log("messi")
     const clientes = await db.Cliente.findAll();
     const usersDataValues = clientes.map(clientes => clientes.dataValues);
     return usersDataValues;
@@ -141,8 +139,6 @@ app.get("/cliente_list_json", (req, res) => {
 
   // Utilizando .then()
   getClientes().then(clientes => {
-    console.log("hola");
-    console.log(clientes);
     res.send(clientes);
   });
 });
@@ -210,38 +206,27 @@ app.get("/reservas_create", (req, res) => {
   });
 });
 app.post("/reservas_create_post", (req, res) => {
-  async function postReservas() {
-    const reservas = await db.Reserva.findAll({
-      include: [
-        {
-          model: db.Restaurante,
-          attributes: ['nombre']
-        },
-        {
-          model: db.Mesa,
-          attributes: ['nombre_mesa']
+  console.log("RESERVA AA");
+  const reserva = {
+    restaurante: req.body.restaurante,
+    mesa: req.body.mesas,
+    fecha: req.body.fecha,
+    hora: req.body.hora,
+    
+};
+    // Guardamos en la base de datos
+    console.log(reserva);
 
-        },
-        {
-          model: db.Cliente,
-          attributes: ['nombre', 'apellido']
-        }
-      ]
-    });
-    const usersDataValues = reservas.map(reservas => reservas.dataValues);
-    const restaurantes = await db.Restaurante.findAll();
-    const mesas = await db.Mesa.findAll();
-    const clientes = await db.Cliente.findAll();
-    const usersDataValues0 = restaurantes.map(restaurantes => restaurantes.dataValues);
-    const usersDataValues1 = clientes.map(clientes => clientes.dataValues);
-    const usersDataValues2 = mesas.map(mesas => mesas.dataValues);
-    return { usersDataValues, restaurantes: usersDataValues0, clientes: usersDataValues1, mesas: usersDataValues2 };
-  }
-  // Utilizando .then()
-  postReservas().then(data => {
-    res.render("reservas_create", { reservas: data.reservas, result: "resultado", restaurantes: data.restaurantes, mesas: data.mesas, clientes: data.clientes });
-  });
-});
+    // db.Cliente.create(cliente)
+    // .then(() => {
+    //   console.log("entra log");
+    //   res.json({ status: 'success' });
+    // })
+    // .catch((err) => {
+    //   console.log("no entra log");
+    //   res.status(400).json({ message: err.message });
+    // });
+})
 
 require("./app/routes/restaurante.routes")(app);
 require("./app/routes/mesa.routes")(app);

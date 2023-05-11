@@ -1,205 +1,171 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-      <!-- Biblioteca jQuery -->
+  <!-- Biblioteca jQuery -->
 
 
-<!-- Biblioteca jQuery UI -->
-<script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Biblioteca jQuery UI -->
+  <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
 
-<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
-   
-<meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Select two</title>
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
- 
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Select two</title>
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+    integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+    crossorigin="anonymous"></script>
 </head>
-<body>
-    <h1>Ejemplo Select2</h1>
 
-    <button id="crear-cliente" onclick="openDialog()">Crear cliente</button>
-
-      <div id="dialog-form" title="Crear nuevo cliente">
-        <form id="my-form">
-          <fieldset>
-            <label for="nombre">Nombre:</label>
-            <input type="text" name="nombre" id="nombre" class="text ui-widget-content ui-corner-all">
-            <br>
-            <label for="ci">CI:</label>
-            <input type="text" name="ci" id="ci" class="text ui-widget-content ui-corner-all">
-            <br>
-
-            <label for="ci">Apellido:</label>
-            <input type="text" name="apellido" id="apellido" class="text ui-widget-content ui-corner-all">
-            <button type="submit">Crear</button>
-          </fieldset>
-        </form>
-      </div>
-    </div>
+<body style="margin-left: 1vw; margin-top: 1vh;">
+  <h1>Seleccione</h1>
  
+  <br>
 
-    <form id="my-form" action="/get_mesas_disponibles" method="GET">
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Crear cliente</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div id="dialog-form" title="Crear nuevo cliente">
+            <form id="my-form">
+              <label for="nombre">Nombre:</label>
+              <input type="text" name="nombre" id="nombre" class="text ui-widget-content ui-corner-all">
+              <br>
+              <label for="ci">CI:</label>
+              <input type="number" name="ci" id="ci" class="text ui-widget-content ui-corner-all">
+              <br>
+              <label for="apellido">Apellido:</label>
+              <input type="text" name="apellido" id="apellido" class="text ui-widget-content ui-corner-all">
 
-        <div class="form-group w-50">
-          <label for="cliente">Cliente:</label>
-          <select class="js-example-basic-single form-control" id="cliente" name="cliente">
-          </select>
-
-        <div class="form-group w-50">
-          <label for="mesasa">Mesas Disponibles:</label>
-          <select class="form-control" name="mesas" id="mesas">
-            <% for (var i = 0; i < mesas.length; i++) { %>
-              <% if (mesas[i].capacidad == 1) { %>
-                <option value="<%= mesas[i].id %>"><%= mesas[i].nombre_mesa %> para <%= mesas[i].capacidad %> persona</option>
-              <% } else { %>
-                <option value="<%= mesas[i].id %>"><%= mesas[i].nombre_mesa %> para <%= mesas[i].capacidad %> personas</option>
-              <% } %>
-            <% } %>
-          </select>
+            </form>
           </div>
         </div>
+        <div class="modal-footer" id="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+          <button type="submit" class="btn btn-primary">Crear</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-        <input type="submit" value="Crear" class="btn btn-primary">   
-    </form>        
+  <form id="form_post" action="/reservas_create_post" method="POST">
+    <div class="row">
+      <div class="col">
+        <label for="cliente">Cliente:</label>
+        <select class="js-example-basic-single form-control" id="cliente" name="cliente">
+        </select>
+      </div>
+      <div class="col">
+          <!-- Button trigger modal -->
+          <button type="button" class="btn btn-secondary" style="margin-top: 5vh;" data-toggle="modal" data-target="#exampleModal">
+            Crear cliente
+          </button>
+      </div>
+    </div>
+    <br>
+    <div class="form-group w-50">
+      <label for="mesasa">Mesas Disponibles:</label>
+      <select class="form-control" name="mesas" id="mesas">
+        <% for (var i=0; i < mesas.length; i++) { %>
+          <% if (mesas[i].capacidad==1) { %>
+            <option value="<%= mesas[i].id %>">
+              <%= mesas[i].nombre_mesa %> para <%= mesas[i].capacidad %> persona
+            </option>
+            <% } else { %>
+              <option value="<%= mesas[i].id %>">
+                <%= mesas[i].nombre_mesa %> para <%= mesas[i].capacidad %> personas
+              </option>
+              <% } %>
+                <% } %>
+      </select>
+    </div>
+      <input type="hidden" id="restaurante" name="restaurante" value="<%= restaurante %>">
+      <input type="hidden" id="hora" name="hora" value="<%= hora %>">
+      <input type="hidden" name="fecha" id="fecha" value="<%= fecha %>">
+      <input type="submit" value="Crear" class="btn btn-primary">
+  </form>
 
 
   <script>
- $(document).ready(function() {
-  $(function() {
-    $.ajax({
-      type: 'GET',
-      url: 'cliente_list_json',
-      success: function(response) {
-        $.each(response, function (indice, row) {
-          var optionText = row.nombre + " (" + row.ci + ")";
-          $(".js-example-basic-single").append("<option value='" + row.ci + "' data-nombre='" + row.nombre + "'>" + optionText + "</option>");
-        });
-        $('.js-example-basic-single').select2({
-          templateResult: function(result) {
-            if (!result.id) {
-              return result.text;
-            }
-            var $result = $('<span>' + result.text + '</span>');
-            $result.find('span').addClass('text-muted small');
-            $result.find('span').text(' (' + result.element.dataset.nombre + ')');
-            return $result;
+    $(document).ready(function () {
+      $(function () {
+        $.ajax({
+          type: 'GET',
+          url: '/cliente_list_json',
+          success: function (response) {
+            $.each(response, function (indice, row) {
+              var optionText = row.nombre + " (" + row.ci + ")";
+              $(".js-example-basic-single").append("<option value='" + row.ci + "' data-nombre='" + row.nombre + "'>" + optionText + "</option>");
+            });
+            $('.js-example-basic-single').select2({
+              templateResult: function (result) {
+                if (!result.id) {
+                  return result.text;
+                }
+                var $result = $('<span>' + result.text + '</span>');
+                $result.find('span').addClass('text-muted small');
+                $result.find('span').text(' (' + result.element.dataset.nombre + ')');
+                return $result;
+              }
+            })
           }
-        })
-      }
-    });
-  });
-});
-
- $(document).ready(function() {
-  $(function() {
-    $.ajax({
-      type: 'GET',
-      url: 'cliente_list_json',
-      success: function(response) {
-        $.each(response, function (indice, row) {
-          var optionText = row.nombre + " (" + row.ci + ")";
-          $(".js-example-basic-single").append("<option value='" + row.ci + "' data-nombre='" + row.nombre + "'>" + optionText + "</option>");
         });
-        $('.js-example-basic-single').select2({
-          templateResult: function(result) {
-            if (!result.id) {
-              return result.text;
-            }
-            var $result = $('<span>' + result.text + '</span>');
-            $result.find('span').addClass('text-muted small');
-            $result.find('span').text(' (' + result.element.dataset.nombre + ')');
-            return $result;
-          }
-        })
-      }
-    });
-  });
-});
-
-$(document).ready(function() {
-  $('#my-form').submit(function(e) {
-    e.preventDefault(); // Evita que se envíe el formulario por defecto
-    $.ajax({
-      url: '/clientes_create', // La URL a la que se enviarán los datos
-      type: 'POST', // El método de envío de datos
-      data: $('#my-form').serialize(), // Los datos del formulario
-      success: function(response) {
-        if (response.status === 'success') {
-          actualizarSelect(); // Actualizar el select2 de clientes
-          $('#dialog-form').dialog('close'); // Cerrar el cuadro de diálogo
-        } else {
-          alert('Ocurrió un error al crear el cliente.');
-        }
-        // Aquí puedes realizar alguna acción si la petición fue exitosa
-        console.log(response);
-      },
-      error: function(error) {
-        // Aquí puedes realizar alguna acción si la petición falló
-        console.log(error);
-      }
-    });
-  });
-});
-
-
-function actualizarSelect() {
-  $.ajax({
-    type: 'GET',
-    url: 'cliente_list_json',
-    success: function(response) {
-      var $select = $('.js-example-basic-single');
-      $select.empty(); // vaciar opciones existentes
-      $.each(response, function (indice, row) {
-        var optionText = row.nombre + " (" + row.ci + ")";
-        $select.append("<option value='" + row.ci + "' data-nombre='" + row.nombre + "'>" + optionText + "</option>");
       });
-      $select.trigger('change'); // disparar evento 'change' para actualizar la visualización de Select2
+    });
+
+    $(document).ready(function () {
+      // $('#my-form').submit(function (e) {
+        $('#exampleModal').on('click', 'button[type="submit"]', function(e) {
+        e.preventDefault(); // Evita que se envíe el formulario por defecto
+        $.ajax({
+          url: '/clientes_create', // La URL a la que se enviarán los datos
+          type: 'POST', // El método de envío de datos
+          data: $('#my-form').serialize(), // Los datos del formulario
+          success: function (response) {
+            if (response.status === 'success') {
+              actualizarSelect(); // Actualizar el select2 de clientes
+              $('#dialog-form').dialog('close'); // Cerrar el cuadro de diálogo
+            } else {
+              alert('Ocurrió un error al crear el cliente.');
+            }
+            // Aquí puedes realizar alguna acción si la petición fue exitosa
+            console.log(response);
+          },
+          error: function (error) {
+            // Aquí puedes realizar alguna acción si la petición falló
+            console.log(error);
+          }
+        });
+      });
+    });
+
+
+    function actualizarSelect() {
+      $.ajax({
+        type: 'GET',
+        url: 'cliente_list_json',
+        success: function (response) {
+          var $select = $('.js-example-basic-single');
+          $select.empty(); // vaciar opciones existentes
+          $.each(response, function (indice, row) {
+            var optionText = row.nombre + " (" + row.ci + ")";
+            $select.append("<option value='" + row.ci + "' data-nombre='" + row.nombre + "'>" + optionText + "</option>");
+          });
+          $select.trigger('change'); // disparar evento 'change' para actualizar la visualización de Select2
+        }
+      });
     }
-  });
-}
-// function openDialog() {
-//     $("#dialog-form").dialog({
-//       modal: true,
-//       buttons: {
-//         "Crear": {
-//           text: "Crear",
-//           type: "submit",
-//           class: "btn btn-primary",
-//           click: function() {
-//             $("#my-form").submit();
-//           }
-//         },
-//         "Cancelar": function() {
-//           $(this).dialog("close");
-//         }
-//       }
-//     });
-//   }
-function openDialog() {
-  $('#dialog-form').dialog({
-    modal: true,
-    width: 'auto',
-    buttons: {
-      'Crear': function() {
-        $('#my-form').submit(); // Envía el formulario cuando se presiona el botón 'Crear'
-      },
-      'Cancelar': function() {
-        $(this).dialog('close'); // Cierra el cuadro de diálogo cuando se presiona el botón 'Cancelar'
-      }
-    }
-  });
-}
-
-
-
-</script>
-      
-          
+  </script>
 </body>
-
-
 </html>
