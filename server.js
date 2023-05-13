@@ -101,6 +101,7 @@ app.get("/get_mesas_disponibles", (req, res) => {
       },
     });
 
+
     // Obtenemos los IDs de las mesas reservadas
     const mesasReservadasIds = reservas.map((reserva) => reserva.id_mesa);
 
@@ -206,7 +207,6 @@ app.get("/reservas_create", (req, res) => {
   });
 });
 app.post("/reservas_create_post", (req, res) => {
-  console.log("RESERVA AA");
   const reserva = {
     restaurante: req.body.restaurante,
     mesa: req.body.mesas,

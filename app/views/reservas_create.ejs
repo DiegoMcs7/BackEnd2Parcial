@@ -40,7 +40,6 @@
         <option value="7">22 a 23</option>
       </select>
       </div>
-      
       <input type="submit" value="Buscar" class="btn btn-primary">           
     </form>
        
@@ -75,5 +74,27 @@
     }
 
   </script> -->
+  <script>
+
+const horaSelect = document.getElementById('hora');
+horaSelect.addEventListener('change', (event) => {
+  const opcionesSeleccionadas = [...event.target.options].filter(option => option.selected);
+  const horasSeleccionadas = opcionesSeleccionadas.map(option => parseInt(option.value));
+  const horasConsecutivas = horasSeleccionadas.slice(1).every((hora, index) => hora === horasSeleccionadas[index] + 1);
+  if (!horasConsecutivas) {
+    alert('Debes seleccionar horas consecutivas');
+    // Deseleccionar opciones no consecutivas
+    opcionesSeleccionadas.forEach(option => {
+      if (option.index > 0 && parseInt(option.value) !== horasSeleccionadas[0] + option.index) {
+        option.selected = false;
+      }
+    });
+    // Deseleccionar todas las opciones seleccionadas
+    horaSelect.selectedIndex = -1;
+  }
+});
+
+
+  </script>
   </body>
 </html>
