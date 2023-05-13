@@ -92,12 +92,16 @@ app.get("/restaurante_list", (req, res) => {
 app.get("/get_mesas_disponibles", (req, res) => {
   const Op = db.Sequelize.Op;
   async function getMesasDisponibles() {
+    let hora = req.query.hora;
+    if (!Array.isArray(hora)) {
+      hora = [hora];
+    }
     // Primero, buscamos todas las reservas existentes para la fecha y horas seleccionadas en el restaurante deseado
     const reservas = await db.Reserva.findAll({
       where: {
         id_restaurante: req.query.restaurante,
         fecha: req.query.fecha,
-        hora: { [Op.in]: req.query.hora.split(',') },
+        hora: hora,
       },
     });
 
@@ -122,11 +126,14 @@ app.get("/get_mesas_disponibles", (req, res) => {
     return usersDataValues;
   }
 
-  // Utilizando .then()
   getMesasDisponibles().then(mesasDisponibles => {
-    console.log(req.query.hora );
+    let hora = req.query.hora;
+    if (!Array.isArray(hora)) {
+      hora = [hora];
+    }
+    console.log(hora );
     res.render("mesa_list_reservas", { mesas: mesasDisponibles, restaurante: req.query.restaurante, 
-      fecha: req.query.fecha, hora: { [Op.in]: req.query.hora.split(',') },
+      fecha: req.query.fecha, hora: hora,
   });
   });
 });
@@ -207,25 +214,57 @@ app.get("/reservas_create", (req, res) => {
   });
 });
 app.post("/reservas_create_post", (req, res) => {
+  let hora_aux = req.body.hora;
+  console.log(hora_aux);
+
+  if (!Array.isArray(hora_aux)) {
+    hora_aux = [hora_aux];
+  }
   const reserva = {
-    restaurante: req.body.restaurante,
-    mesa: req.body.mesas,
+    id_restaurante: req.body.restaurante,
+    id_cliente: req.body.cliente,
+    id_mesa: req.body.mesas,
     fecha: req.body.fecha,
-    hora: req.body.hora,
+    hora: hora_aux,
+    cantidad: '1',
     
-};
+  };
+  console.log(reserva);
+
+  const horas = [
+    { id: '1', rango: '12 a 13' },
+    { id: '2', rango: '13 a 14' },
+    { id: '3', rango: '14 a 15' },
+    { id: '4', rango: '19 a 20' },
+    { id: '5', rango: '20 a 21' },
+    { id: '6', rango: '21 a 22' },
+    { id: '7', rango: '22 a 23' }
+];
+
+  function buscarHoraPorIds(ids) {
+    if (ids === undefined) {
+        return [];
+    }
+    const idArray = ids[0].split(','); // Separa el string de ids en un arreglo
+    return idArray.map(id => horas.find(hora => hora.id === id)?.rango);
+  }
+
+  const hora = buscarHoraPorIds(hora_aux);
+  reserva.hora = hora.join(', '); // unimos las horas seleccionadas en una cadena de texto separada por comas
+
+
     // Guardamos en la base de datos
     console.log(reserva);
 
-    // db.Cliente.create(cliente)
-    // .then(() => {
-    //   console.log("entra log");
-    //   res.json({ status: 'success' });
-    // })
-    // .catch((err) => {
-    //   console.log("no entra log");
-    //   res.status(400).json({ message: err.message });
-    // });
+    db.Reserva.create(reserva)
+    .then(() => {
+      console.log("entra log");
+      res.json({ status: 'success' });
+    })
+    .catch((err) => {
+      console.log("no entra log");
+      res.status(400).json({ message: err.message });
+    });
 })
 
 require("./app/routes/restaurante.routes")(app);
