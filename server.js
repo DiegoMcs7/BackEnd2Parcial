@@ -87,29 +87,45 @@ app.get("/restaurante_list", (req, res) => {
 });
 
 
-
-
 app.get("/get_mesas_disponibles", (req, res) => {
   const Op = db.Sequelize.Op;
   async function getMesasDisponibles() {
-    let hora = req.query.hora;
-    if (!Array.isArray(hora)) {
-      hora = [hora];
+    let hora_aux = req.query.hora;
+    if (!Array.isArray(hora_aux)) {
+      hora_aux = [hora_aux];
     }
-    // Primero, buscamos todas las reservas existentes para la fecha y horas seleccionadas en el restaurante deseado
+    const horas = [
+      { id: 1, rango: '12 a 13' },
+      { id: 2, rango: '13 a 14' },
+      { id: 3, rango: '14 a 15' },
+      { id: 4, rango: '19 a 20' },
+      { id: 5, rango: '20 a 21' },
+      { id: 6, rango: '21 a 22' },
+      { id: 7, rango: '22 a 23' }
+    ];
+  
+    function buscarHoraPorIds(ids) {
+      if (ids === undefined) {
+          return [];
+      }
+      const idArray = ids.join(',').split(','); // Convert array to string and split
+      return idArray.map(id => horas.find(hora => hora.id === parseInt(id))?.rango);
+    }    
+  
+    const horaa = buscarHoraPorIds(hora_aux); // horaa es un string con dos valores separados por coma, por ejemplo: "12 a 13, 13 a 14"
+    const horaaArray = horaa.map(h => h.trim()); // convierte a arreglo y quita espacios en blanco, por ejemplo: ["12 a 13", "13 a 14"]
+    const whereClause = horaaArray.map(h => ({ hora: { [Op.iLike]: `%${h}%` } })); // convierte cada elemento en un objeto de búsqueda
     const reservas = await db.Reserva.findAll({
       where: {
         id_restaurante: req.query.restaurante,
         fecha: req.query.fecha,
-        hora: hora,
-      },
+        [Op.or]: whereClause // busca cualquier registro que contenga cualquiera de los valores especificados en el arreglo
+      }
     });
 
-
-    // Obtenemos los IDs de las mesas reservadas
     const mesasReservadasIds = reservas.map((reserva) => reserva.id_mesa);
+    console.log(mesasReservadasIds);
 
-    // Buscamos todas las mesas del restaurante que no están en la lista de mesas reservadas
     const mesasDisponibles = await db.Mesa.findAll({
       include: [{
         model: db.Restaurante,
@@ -131,12 +147,18 @@ app.get("/get_mesas_disponibles", (req, res) => {
     if (!Array.isArray(hora)) {
       hora = [hora];
     }
-    console.log(hora );
-    res.render("mesa_list_reservas", { mesas: mesasDisponibles, restaurante: req.query.restaurante, 
-      fecha: req.query.fecha, hora: hora,
-  });
+    res.render("mesa_list_reservas", {
+      mesas: mesasDisponibles,
+      restaurante: req.query.restaurante,
+      fecha: req.query.fecha,
+      hora: hora,
+    });
+  }).catch(error => {
+    console.error(error);
+    res.status(500).send('Internal server error');
   });
 });
+
 
 app.get("/cliente_list_json", (req, res) => {
   async function getClientes() {
