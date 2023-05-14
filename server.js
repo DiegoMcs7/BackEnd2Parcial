@@ -281,7 +281,30 @@ app.post("/reservas_create_post", (req, res) => {
     db.Reserva.create(reserva)
     .then(() => {
       console.log("entra log");
-      res.json({ status: 'success' });
+      async function getReservas() {
+        const reservas = await db.Reserva.findAll({
+          include: [
+            {
+              model: db.Restaurante,
+              attributes: ['nombre']
+            },
+            {
+              model: db.Mesa,
+              attributes: ['nombre_mesa']
+    
+            },
+            {
+              model: db.Cliente,
+              attributes: ['nombre', 'apellido']
+            }
+          ]
+        });
+        const usersDataValues = reservas.map(reservas => reservas.dataValues);
+        return usersDataValues;
+      }
+      getReservas().then(reservas => {
+        res.render("reservas_list", { reservas: reservas });
+      });
     })
     .catch((err) => {
       console.log("no entra log");

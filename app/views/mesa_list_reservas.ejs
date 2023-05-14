@@ -146,7 +146,7 @@
           success: function (response) {
             if (response.status === 'success') {
               actualizarSelect(); // Actualizar el select2 de clientes
-              $('#dialog-form').dialog('close'); // Cerrar el cuadro de diálogo
+              $('#exampleModal').modal('hide'); // Cerrar el cuadro de diálogo
             } else {
               alert('Ocurrió un error al crear el cliente.');
             }
