@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
+<!-- <!DOCTYPE html>
+<html lang="es">
 
 <meta charset="utf-8">
 <head>
@@ -37,4 +37,135 @@
         <script type="text/javascript" src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
         <script type="text/javascript" src="main.js"></script> 
     </body>
+</html> -->
+
+ <!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Column Filtering</title>
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.4/css/jquery.dataTables.css">
+  
+</head>
+<body>
+
+  <h1>Lista de Reservas</h1>
+        <table id="example" class="table table-striped" style="text-align: center;">
+            <thead>
+            <tr> 
+                <th>RESTAURANTE</th>
+                <th>MESA</th> 
+                <th>FECHA</th> 
+                <th>HORA</th> 
+                <th>CLIENTE</th> 
+                <th>CANTIDAD</th> 
+            </tr>
+        </thead>
+        <tbody>
+            <% for(let i = 0; i < reservas.length; i++) { %>
+            <tr>
+                <td><%= reservas[i].Restaurante.nombre %></td>
+                <td><%= reservas[i].Mesa.nombre_mesa %></td>
+                <td><%= reservas[i].fecha %></td>
+                <td><%= reservas[i].hora %></td>
+                <td><%= reservas[i].Cliente.nombre%> <%= reservas[i].Cliente.apellido%> </td>
+                <td><%= reservas[i].cantidad %></td>
+            </tr>
+            <% } %>
+        </tbody>
+        </table>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
+  <script>
+   $(document).ready(function () {
+    $.extend($.fn.dataTable.defaults, {
+        language: {
+          "sProcessing": "Procesando...",
+          "sLengthMenu": "Mostrar _MENU_ registros",
+          "sZeroRecords": "No se encontraron resultados",
+          "sEmptyTable": "Ningún dato disponible en esta tabla",
+          "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+          "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+          "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+          "sInfoPostFix": "",
+          "sSearch": "Buscar:",
+          "sUrl": "",
+          "sInfoThousands": ",",
+          "sLoadingRecords": "Cargando...",
+          "oPaginate": {
+            "sFirst": "Primero",
+            "sLast": "Último",
+            "sNext": "Siguiente",
+            "sPrevious": "Anterior"
+          },
+          "oAria": {
+            "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
+            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+          }
+        }
+      });
+    // Setup - add a text input to each footer cell
+    $('#example thead tr')
+        .clone(true)
+        .addClass('filters')
+        .appendTo('#example thead');
+ 
+    var table = $('#example').DataTable({
+        order: [[1, 'asc'], [3, 'asc']], // Ordenar por la primera columna de forma creciente y la segunda columna de forma descendente
+        orderCellsTop: true,
+        fixedHeader: true,
+        initComplete: function () {
+            var api = this.api();
+ 
+            // For each column
+            api
+                .columns()
+                .eq(0)
+                .each(function (colIdx) {
+                    // Set the header cell to contain the input element
+                    var cell = $('.filters th').eq(
+                        $(api.column(colIdx).header()).index()
+                    );
+                    var title = $(cell).text();
+                    $(cell).html('<input type="text" placeholder="' + title + '" />');
+ 
+                    // On every keypress in this input
+                    $(
+                        'input',
+                        $('.filters th').eq($(api.column(colIdx).header()).index())
+                    )
+                        .off('keyup change')
+                        .on('change', function (e) {
+                            // Get the search value
+                            $(this).attr('title', $(this).val());
+                            var regexr = '({search})'; //$(this).parents('th').find('select').val();
+ 
+                            var cursorPosition = this.selectionStart;
+                            // Search the column for that value
+                            api
+                                .column(colIdx)
+                                .search(
+                                    this.value != ''
+                                        ? regexr.replace('{search}', '(((' + this.value + ')))')
+                                        : '',
+                                    this.value != '',
+                                    this.value == ''
+                                )
+                                .draw();
+                        })
+                        .on('keyup', function (e) {
+                            e.stopPropagation();
+ 
+                            $(this).trigger('change');
+                            $(this)
+                                .focus()[0]
+                                .setSelectionRange(cursorPosition, cursorPosition);
+                        });
+                });
+        },
+    });
+});
+  </script>
+</body>
 </html>
