@@ -11,9 +11,11 @@ exports.create = (req, res) => {
     // Guardamos a la base de datos
     Cliente.create(cliente)
         .then(data => {
+            console.log("Cliente creado", cliente);
             res.send(data);
         })
         .catch(err => {
+            console.log("Error al crear");
             res.status(500).send({
                 message:
                     err.message || "Ha ocurrido un error al crear el cliente."
@@ -41,9 +43,11 @@ exports.findAll = (req, res) => {
   
     Cliente.findAll({ where: condition })
       .then(data => {
+        console.log("Lista de clientes", data);
         res.send(data);
       })
       .catch(err => {
+        console.log("Error al obtener clientes");
         res.status(500).send({
           message:
             err.message || "Ocurrio un error al obtener los clientes."

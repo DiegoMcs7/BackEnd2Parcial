@@ -10,9 +10,11 @@ exports.create = (req, res) => {
     // Guardamos a la base de datos
     Restaurante.create(restaurante)
         .then(data => {
+            console.log("Restaurante creado", restaurante);
             res.send(data);
         })
         .catch(err => {
+          console.log("Error al crear el restaurante");
             res.status(500).send({
                 message:
                     err.message || "Ha ocurrido un error al crear un restaurante."
@@ -40,9 +42,12 @@ exports.findAll = (req, res) => {
 
     Restaurante.findAll({ where: condition })
         .then(data => {
+          console.log("Lista de restaurante", data);
             res.send(data);
         })
         .catch(err => {
+          console.log("Error al listar los restaurantes");
+
             res.status(500).send({
                 message:
                     err.message || "Ocurrio un error al obtener los restaurantes."
