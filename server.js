@@ -248,7 +248,7 @@ app.post("/reservas_create_post", (req, res) => {
     id_mesa: req.body.mesas,
     fecha: req.body.fecha,
     hora: hora_aux,
-    cantidad: req.body.cantidad,
+    cantidad: '1',
     
   };
   console.log(reserva);
@@ -276,9 +276,11 @@ app.post("/reservas_create_post", (req, res) => {
 
 
     // Guardamos en la base de datos
+    console.log(reserva);
 
     db.Reserva.create(reserva)
     .then(() => {
+      console.log("entra log");
       async function getReservas() {
         const reservas = await db.Reserva.findAll({
           include: [
@@ -301,20 +303,28 @@ app.post("/reservas_create_post", (req, res) => {
         return usersDataValues;
       }
       getReservas().then(reservas => {
-        console.log("Reserva creada correctamente", reservas)
         res.render("reservas_list", { reservas: reservas });
       });
     })
     .catch((err) => {
-      console.log("La reserva no fue creada");
+      console.log("no entra log");
       res.status(400).json({ message: err.message });
     });
 })
+
+app.get('/ruta-del-endpoint/:mesaid', (req, res) => {
+  // Lógica del endpoint
+  
+});
 
 require("./app/routes/restaurante.routes")(app);
 require("./app/routes/mesa.routes")(app);
 require("./app/routes/cliente.routes")(app);
 require("./app/routes/reserva.routes")(app);
+require("./app/routes/categoria.routes")(app);
+require("./app/routes/producto.routes")(app);
+require("./app/routes/consumo_cabecera.routes")(app);
+//require("./app/routes/consumo_detalle.routes")(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 9090;

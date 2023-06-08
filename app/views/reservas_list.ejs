@@ -59,6 +59,7 @@
                 <th>HORA</th> 
                 <th>CLIENTE</th> 
                 <th>CANTIDAD</th> 
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -70,6 +71,7 @@
                 <td><%= reservas[i].hora %></td>
                 <td><%= reservas[i].Cliente.nombre%> <%= reservas[i].Cliente.apellido%> </td>
                 <td><%= reservas[i].cantidad %></td>
+                <td><button type="button" class="btn btn-primary" onclick="window.location.href='/ruta-del-endpoint/<%= reservas[i].id_mesa %>'">Consumo</button></td>
             </tr>
             <% } %>
         </tbody>
