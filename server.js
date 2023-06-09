@@ -312,8 +312,11 @@ app.post("/reservas_create_post", (req, res) => {
     });
 })
 
-app.get('/ruta-del-endpoint/:mesaid', (req, res) => {
-  // Lógica del endpoint
+app.get('/gestion-consumo/:mesaid', (req, res) => {
+  const mesaID = req.params.mesaid;
+  console.log(mesaID);
+
+  
   
 });
 
