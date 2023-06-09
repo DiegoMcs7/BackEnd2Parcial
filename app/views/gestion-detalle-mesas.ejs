@@ -28,7 +28,7 @@
 </head>
 
 <body style="margin-left: 1vw; margin-top: 1vh;">
-  <h1>Seleccione el cliente</h1>
+  <h1>Agregue el consumo</h1>
  
   <br>
 
@@ -40,7 +40,7 @@
         <% for (var i=0; i < productos.length; i++) { %>
             
             <option value="<%= productos[i].id %>">
-              <%= productos[i].nombre %> precio:  <%= productos[i].precio %>
+              <%= productos[i].nombre_producto %> / PRECIO:  <%= productos[i].precio %>
             </option>
             
         <% } %>
@@ -48,37 +48,67 @@
     </div>
     <br>
 
+    <label for="cantidad">Cantidad:</label>
     <input type="number" id="cantidad" name="cantidad" value="1">
     <input type="hidden" id="cabecera" name="cabecera" value="<%= cabecera %>">
+    <br>
     <input type="submit" value="Agregar producto" class="btn btn-primary">
     <p style="margin-top: 3vh;"class="btn btn-secondary" onclick="window.history.back()">Atrás</p>
 
   </form>
   
-<div id="resultado"></div>
+<div id="resultado">
+
+  <table align="left" border="4">
+    <tr> 
+        <th>PRODUCTO</th>
+        <th>CANTIDAD</th> 
+    </tr>
+    <% for(let i = 0; i < detalleCreado.length; i++) { %>
+    <tr>
+        <td><%= detalleCreado[i].id_producto.nombre_producto %></td>
+        <td><%= detalleCreado[i].cantidad %></td>
+    </tr>
+    <% } %>
+    
+</table>
+
+</div>
 
 <script>
-    // Capturamos el evento de envío del formulario
-    document.getElementById("form_post").addEventListener("submit", function(event) {
-        event.preventDefault(); // Evitamos la recarga de la página
+   $(document).ready(function() {
+  // Capturar el evento de envío del formulario
+  $('#form_post').submit(function(event) {
+    event.preventDefault(); // Prevenir el comportamiento predeterminado del formulario
 
-        // Realizamos la solicitud AJAX
-        var formData = new FormData(this);
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", this.action);
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === XMLHttpRequest.DONE) {
-                if (xhr.status === 200) {
-                    // Actualizamos el contenido del div con la respuesta del servidor
-                    document.getElementById("resultado").innerHTML = xhr.responseText;
-                } else {
-                    // Manejo de errores
-                    console.error(xhr.status);
-                }
-            }
-        };
-        xhr.send(formData);
+    // Obtener los datos del formulario
+    const productoId = $('#productos').val();
+    const cantidad = $('#cantidad').val();
+    const cabeceraId = $('#cabecera').val();
+
+    // Crear el objeto de datos a enviar
+    const datos = {
+      producto: productoId,
+      cantidad: cantidad,
+      cabecera: cabeceraId
+    };
+
+    // Realizar la petición AJAX
+    $.ajax({
+      url: '/crear_detalle_consumo',
+      method: 'POST',
+      data: datos,
+      success: function(response) {
+        // Actualizar el contenido del resultado con la respuesta recibida
+        $('#resultado').html(response);
+      },
+      error: function(xhr, status, error) {
+        console.log(error);
+      }
     });
+  });
+});
+
 </script>
 
 </body>

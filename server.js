@@ -338,7 +338,6 @@ app.get('/gestion-consumo/:mesaid', (req, res) => {
 });
 
 app.post("/crear_cabecera_consumo", (req, res) => {
-
   async function getProducto() {
     const productos = await db.Producto.findAll();
     const usersDataValues = productos.map(productos => productos.dataValues);
@@ -347,7 +346,6 @@ app.post("/crear_cabecera_consumo", (req, res) => {
 
   // Utilizando .then()
   getProducto().then(productos => {
-
     const cabecera = {
       id_mesa: req.body.mesa,
       id_cliente: req.body.cliente,
@@ -355,57 +353,62 @@ app.post("/crear_cabecera_consumo", (req, res) => {
       estado: "abierto",
     };
 
-    cabecera = db.Cabecera.create(cabecera)
-    .then(() => {
-      console.log("HOLALALALAALALAL");
-      
-      console.log(cabecera);
-      // res.render("gestion-detalle-mesas", { cabecera: cabecera.id, productos: productos });
-
-    })
-    .catch((err) => {
-      console.log("no entra log");
-      res.status(400).json({ message: err.message });
-    });
-      
+    db.Cabecera.create(cabecera)
+      .then((cabecera_last) => {
+        console.log("Cabecera creada:", cabecera_last.id);
+        // Puedes hacer lo que necesites con el ID aquí
+        res.render("gestion-detalle-mesas", { cabecera: cabecera_last.id, productos: productos });
+      })
+      .catch((err) => {
+        console.log("Error al crear la cabecera:", err.message);
+        res.status(400).json({ message: err.message });
+      });
   });
-
- 
-
-    
-})
+});
 
 app.post("/crear_detalle_consumo", (req, res) => {
-
-  async function getProducto() {
-    const productos = await db.Producto.findAll();
-    const usersDataValues = productos.map(productos => productos.dataValues);
-    return usersDataValues;
+  async function getCabecera() {
+    const cabecera = await db.Cabecera.findByPk(req.body.cabecera);
+    const producto = await db.Producto.findByPk(req.body.producto);
+    return { cabecera, producto };
   }
 
   // Utilizando .then()
-  getProducto().then(productos => {
+  getCabecera()
+    .then(({ cabecera, producto }) => {
+      if (!cabecera) {
+        // La cabecera no existe
+        return res.status(404).json({ message: "Cabecera no encontrada" });
+      }
 
-    const detalle = {
-      id_producto: req.body.producto,
-      id_cabecera: req.body.cabecera,
-      cantidad: req.body.cantidad,
-    };
-  
-      db.Cabecera.create(cabecera)
-      .then(() => {
-        res.render("gestion-detalle-mesas", { productos:productos, });
-  
-      })
-      .catch((err) => {
-        console.log("no entra log");
-        res.status(400).json({ message: err.message });
-      });
-      
-  });
+      const detalle = {
+        id_producto: req.body.producto,
+        id_cabecera: req.body.cabecera,
+        cantidad: req.body.cantidad,
+      };
 
-  
-})
+      db.Detalle.create(detalle)
+        .then((detalleCreado) => {
+          // Aquí puedes realizar los cambios necesarios en la cabecera
+          cabecera.total += detalle.cantidad * producto.precio;
+          console.log();          // Guardar los cambios en la base de datos
+          cabecera
+            .save()
+            .then(() => {
+              res.json(detalleCreado); // Devolver el objeto de detalle creado
+            });
+        })
+        .catch((err) => {
+          console.log("Error al crear el detalle:", err.message);
+          res.status(400).json({ message: err.message });
+        });
+    })
+    .catch((err) => {
+      console.log("Error al obtener la cabecera:", err.message);
+      res.status(400).json({ message: err.message });
+    });
+});
+
 
 
 require("./app/routes/restaurante.routes")(app);

@@ -59,3 +59,27 @@ exports.findAll = (req, res) => {
         });
       });
   };
+
+  
+exports.findOne = (req, res) => {
+    const id = req.params.id;
+  
+    Cabecera.findByPk(id, {
+        include: [{ model: db.Mesa },
+            { model: db.Cliente }]
+      })
+      .then(data => {
+        if (data) {
+          res.send(data);
+        } else {
+          res.status(404).send({
+            message: `No se encontró una cabecera con id=${id}.`
+          });
+        }
+      })
+      .catch(err => {
+        res.status(500).send({
+          message: `Ocurrió un error al obtener la cabecera con id=${id}.`
+        });
+      });
+  };
