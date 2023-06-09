@@ -27,9 +27,16 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING,
             allowNull: false
         },
+        
+        fecha_creacion: {
+            type: Sequelize.DATE,
+            allowNull: false,
+            defaultValue: Sequelize.NOW // Establece la fecha y hora actual automáticamente
+        },
+
         fecha_cierre: {
-            type: Sequelize.DATEONLY,
-            allowNull: false
+            type: Sequelize.DATE,
+            allowNull: true
         },
         
       });

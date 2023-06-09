@@ -5,14 +5,14 @@ module.exports = (sequelize, Sequelize) => {
             primaryKey: true,
             autoIncrement: true
         },
-        id_cliente: {
+        id_cabecera: {
             type: Sequelize.INTEGER,
             references: {
                 model: 'Cabeceras',
                 key: 'id'
             }
         },
-        id_mesa: {
+        id_producto: {
             type: Sequelize.INTEGER,
             references: {
                 model: 'Productos',
@@ -21,9 +21,9 @@ module.exports = (sequelize, Sequelize) => {
         },
         cantidad: {
             type: Sequelize.INTEGER,
-            allowNull: false
+            allowNull: false,
+            defaultValue: 1
         }
-        
       });
     
     return Detalle;

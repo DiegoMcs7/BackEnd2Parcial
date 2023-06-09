@@ -313,12 +313,100 @@ app.post("/reservas_create_post", (req, res) => {
 })
 
 app.get('/gestion-consumo/:mesaid', (req, res) => {
-  const mesaID = req.params.mesaid;
-  console.log(mesaID);
+    async function getCabecera() {
+      const mesaID = req.params.mesaid;
+      console.log(mesaID);
+      const listado_consumo = await db.Cabecera.findAll({
+        where: {
+          id_mesa: req.params.mesaid,
+       }
+      });
+      const usersDataValues = listado_consumo.map(listado_consumo => listado_consumo.dataValues);
+      return usersDataValues;
+    }
+    getCabecera().then(listado_consumo => {
+      const contador_cerrado =0;
+     // si el valor de  contador_cerrado es 1 entonces hay consumos no cerrados, por lo tanto no se puede crear un nuevo consumo
+      for (let i = 0; i < listado_consumo.length; i++) {
+        if (listado_consumo[i].estado === 'cerrado') {
+            contador_cerrado = 1;
+        }
+      }
+      console.log(req.params.mesaid);
+      res.render("gestion-consumo-mesas", { mesa: req.params.mesaid, listado_consumo: listado_consumo, contador_cerrado: contador_cerrado });
+    });
+});
+
+app.post("/crear_cabecera_consumo", (req, res) => {
+
+  async function getProducto() {
+    const productos = await db.Producto.findAll();
+    const usersDataValues = productos.map(productos => productos.dataValues);
+    return usersDataValues;
+  }
+
+  // Utilizando .then()
+  getProducto().then(productos => {
+
+    const cabecera = {
+      id_mesa: req.body.mesa,
+      id_cliente: req.body.cliente,
+      total: 0,
+      estado: "abierto",
+    };
+
+    cabecera = db.Cabecera.create(cabecera)
+    .then(() => {
+      console.log("HOLALALALAALALAL");
+      
+      console.log(cabecera);
+      // res.render("gestion-detalle-mesas", { cabecera: cabecera.id, productos: productos });
+
+    })
+    .catch((err) => {
+      console.log("no entra log");
+      res.status(400).json({ message: err.message });
+    });
+      
+  });
+
+ 
+
+    
+})
+
+app.post("/crear_detalle_consumo", (req, res) => {
+
+  async function getProducto() {
+    const productos = await db.Producto.findAll();
+    const usersDataValues = productos.map(productos => productos.dataValues);
+    return usersDataValues;
+  }
+
+  // Utilizando .then()
+  getProducto().then(productos => {
+
+    const detalle = {
+      id_producto: req.body.producto,
+      id_cabecera: req.body.cabecera,
+      cantidad: req.body.cantidad,
+    };
+  
+      db.Cabecera.create(cabecera)
+      .then(() => {
+        res.render("gestion-detalle-mesas", { productos:productos, });
+  
+      })
+      .catch((err) => {
+        console.log("no entra log");
+        res.status(400).json({ message: err.message });
+      });
+      
+  });
 
   
-  
-});
+})
+
 
 require("./app/routes/restaurante.routes")(app);
 require("./app/routes/mesa.routes")(app);
@@ -327,7 +415,7 @@ require("./app/routes/reserva.routes")(app);
 require("./app/routes/categoria.routes")(app);
 require("./app/routes/producto.routes")(app);
 require("./app/routes/consumo_cabecera.routes")(app);
-//require("./app/routes/consumo_detalle.routes")(app);
+require("./app/routes/consumo_detalle.routes")(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 9090;
