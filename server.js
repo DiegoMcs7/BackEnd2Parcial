@@ -488,9 +488,6 @@ app.get("/crear_detalle_consumo_tabla_cabecera/:cabeceraid", (req, res) => {
     });
 });
 
-
-
-
 app.get("/cerrar_consumo/:cabeceraid", (req, res) => {
   async function getCabecera() {
     const cabecera = await db.Cabecera.findByPk(req.params.cabeceraid);
@@ -518,46 +515,85 @@ app.get("/cerrar_consumo/:cabeceraid", (req, res) => {
 });
 
 
+const PDFDocument = require('pdfkit');
+const fs = require('fs');
 
-
-app.get("/crear_ticket_pdf/:cabeceraid", (req, res) => {
+app.get('/crear_ticket_pdf/:cabeceraid', (req, res) => {
   async function getCabecera() {
-    const cabecera = await db.Cabecera.findByPk(req.params.cabeceraid);
+    const cabecera = await db.Cabecera.findByPk(req.params.cabeceraid, {
+      include: [db.Cliente],
+    });    
     if (!cabecera) {
-      return res.status(404).json({ message: "Cabecera no encontrada" });
+      return res.status(404).json({ message: 'Cabecera no encontrada' });
     }
 
     const detalles = await db.Detalle.findAll({
       where: {
-        id_cabecera: req.params.cabeceraid
+        id_cabecera: req.params.cabeceraid,
       },
-      include: [db.Producto]
+      include: [{
+        model: db.Producto,
+        attributes: ['nombre_producto','precio']
+      },
+      {
+        model: db.Cabecera,
+        attributes: ['total']
+      }],
     });
 
     if (!detalles) {
-      return res.status(404).json({ message: "Detalles no encontrados" });
+      return res.status(404).json({ message: 'Detalles no encontrados' });
     }
 
-    cabecera.save()
-      .then(() => {
-        // Aquí puedes utilizar los detalles y generar el PDF
-        // ...
-        res.redirect("/gestion-consumo/" + cabecera.id_mesa);
-      })
-      .catch((err) => {
-        console.log("Error al cerrar el consumo:", err.message);
-        res.status(400).json({ message: err.message });
-      });
+    const doc = new PDFDocument();
+
+    // Crear el archivo PDF en memoria
+    const buffers = [];
+    doc.on('data', (buffer) => buffers.push(buffer));
+    doc.on('end', () => {
+      const pdfData = Buffer.concat(buffers);
+      
+      // Enviar el PDF al navegador
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'inline; filename=ticket.pdf');
+      res.send(pdfData);
+    });
+
+    const fechaCreacion = cabecera.fecha_creacion;
+    const date = new Date(fechaCreacion);
+    const formattedFechaCreacion = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+
+    const fechaCierre = cabecera.fecha_cierre;
+    const date1 = new Date(fechaCierre);
+    const formattedFechaCierre = `${date1.getDate()}/${date1.getMonth() + 1}/${date1.getFullYear()} ${date1.getHours()}:${date1.getMinutes()}:${date1.getSeconds()}`;
+    // Agregar contenido al PDF
+    doc.text(`Fecha de Creación: ${formattedFechaCreacion}`);
+    doc.moveDown();
+    doc.text(`Fecha de Creación: ${formattedFechaCierre}`);
+    doc.moveDown();
+    doc.text(`Nombre del cliente: ${cabecera.Cliente.nombre}`);
+    doc.moveDown();
+
+    doc.text('Detalles de consumición:');
+    doc.moveDown();
+    detalles.forEach((detalle) => {
+      const producto = detalle.Producto;
+      console.log(producto.precio);
+      doc.text(`- ${producto.nombre_producto} (Cantidad: ${detalle.cantidad}, Precio: ${producto.precio})`);
+      doc.moveDown();
+    });
+    doc.text(`Total a pagar: ${cabecera.total}`);
+    doc.moveDown();
+
+    // Finalizar y cerrar el documento PDF
+    doc.end();
   }
 
   getCabecera().catch((err) => {
-    console.log("Error al obtener la cabecera:", err.message);
+    console.log('Error al obtener la cabecera:', err.message);
     res.status(400).json({ message: err.message });
   });
 });
-
-
-
 
 
 

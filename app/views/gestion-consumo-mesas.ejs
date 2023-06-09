@@ -115,7 +115,7 @@
         <td><%= listado_consumo[i].fecha_cierre %></td>
         <td><button type="button" class="btn btn-primary" onclick="window.location.href='/crear_detalle_consumo_tabla_cabecera/<%= listado_consumo[i].id %>'">Crear Consumo</button></td>
         <td><button type="button" class="btn btn-secondary" onclick="window.location.href='/cerrar_consumo/<%= listado_consumo[i].id %>'">Cerrar Consumo</button></td>
-        <td><button type="button" class="btn btn-success" onclick="window.location.href='/crear_ticket_pdf/<%= listado_consumo[i].id %>'">Cerrar ticket pdf</button></td>
+        <td><button type="button" class="btn btn-success" onclick="window.location.href='/crear_ticket_pdf/<%= listado_consumo[i].id %>'">Ver ticket pdf</button></td>
 
     </tr>
     <% } %>
