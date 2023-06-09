@@ -447,8 +447,6 @@ app.post("/crear_detalle_consumo", (req, res) => {
 });
 
 
-
-
 app.get("/crear_detalle_consumo_tabla_cabecera/:cabeceraid", (req, res) => {
   async function getCabecera() {
     const cabecera = await db.Cabecera.findByPk(req.params.cabeceraid);
@@ -496,8 +494,12 @@ app.get("/cerrar_consumo/:cabeceraid", (req, res) => {
     }
 
     cabecera.estado = "cerrado"; // Actualizar el estado de la cabecera
-    cabecera.fecha_cierre = Date.now(); // Establecer la fecha de cierre como la fecha actual
-
+    
+    const fechaCierre = Date.now();
+    const date1 = new Date(fechaCierre);
+    const formattedFechaCierre = `${date1.getDate()}/${date1.getMonth() + 1}/${date1.getFullYear()} ${date1.getHours()}:${date1.getMinutes()}:${date1.getSeconds()}`;
+    cabecera.fecha_cierre = formattedFechaCierre;
+    
     cabecera.save()
       .then(() => {
         res.redirect("/gestion-consumo/" + cabecera.id_mesa);
@@ -595,7 +597,50 @@ app.get('/crear_ticket_pdf/:cabeceraid', (req, res) => {
   });
 });
 
+app.get("/cambiar_cliente_accion/:cabeceraid", (req, res) => {
+  const cabeceraId = req.params.cabeceraid;
 
+  db.Cabecera.findByPk(cabeceraId)
+    .then((cabecera) => {
+      if (!cabecera) {
+        return res.status(404).json({ message: "Cabecera no encontrada" });
+      }
+
+      const mesa = cabecera.id_mesa; // Acceder al campo 'nombre' de la cabecera
+
+      res.render("cambiar_cliente", { cabecera: req.params.cabeceraid, mesa: mesa });
+    })
+    .catch((err) => {
+      res.status(400).json({ message: err.message });
+    });
+});
+
+app.post("/cambiar_cliente_cabecera", (req, res) => {
+  const cabeceraId = req.body.cabecera;
+  const cliente = req.body.cliente; // Nuevo cliente a asignar
+
+  db.Cabecera.findByPk(cabeceraId)
+    .then((cabecera) => {
+      if (!cabecera) {
+        return res.status(404).json({ message: "Cabecera no encontrada" });
+      }
+      
+      console.log("QUEAOSDAFKSDJFSDJAF");
+      console.log(cabecera);
+      cabecera.id_cliente = cliente; // Asignar el nuevo cliente
+
+      cabecera.save()
+        .then(() => {
+          res.redirect("/gestion-consumo/" + req.body.mesa);
+        })
+        .catch((err) => {
+          res.status(400).json({ message: err.message });
+        });
+    })
+    .catch((err) => {
+      res.status(400).json({ message: err.message });
+    });
+});
 
 require("./app/routes/restaurante.routes")(app);
 require("./app/routes/mesa.routes")(app);

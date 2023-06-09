@@ -29,7 +29,6 @@
 
 <body style="margin-left: 1vw; margin-top: 1vh;">
 
-<% if (contador_abierto!=1) { %>
 
   <h1>Seleccione el cliente</h1>
  
@@ -68,7 +67,7 @@
     </div>
   </div>
 
-  <form id="form_post" action="/crear_cabecera_consumo" method="POST">
+  <form id="form_post" action="/cambiar_cliente_cabecera" method="POST">
     <div class="row">
       <div class="col">
         <label for="cliente">Cliente:</label>
@@ -85,45 +84,13 @@
     <br>
     
 
+      <input type="hidden" id="cabecera" name="cabecera" value="<%= cabecera %>">
       <input type="hidden" id="mesa" name="mesa" value="<%= mesa %>">
-      <input type="submit" value="Crear" class="btn btn-primary">
+      <input type="submit" value="Cambiar" class="btn btn-primary">
       <p style="margin-top: 3vh;"class="btn btn-secondary" onclick="window.history.back()">Atrás</p>
 
   </form>
-  <% } %>
 
-  
-  <body>
-    <h1>Registro de cabeceras</h1>
-    <table align="left" border="4">
-    <tr> 
-        <th>Cliente</th>
-        <th>Mesa</th>
-        <th>Total</th>
-        <th>Estado</th>
-        <th>Fecha creación</th>  
-        <th>Fecha cierre</th>  
-
-      </tr>
-    <% for(let i = 0; i < listado_consumo.length; i++) { %>
-    <tr>
-        <td><%= listado_consumo[i].Cliente.nombre %></td>
-        <td><%= listado_consumo[i].Mesa.nombre_mesa %></td>
-        <td><%= listado_consumo[i].total %></td>
-        <td><%= listado_consumo[i].estado %></td>
-        <td><%= listado_consumo[i].fecha_creacion %></td>
-        <td><%= listado_consumo[i].fecha_cierre %></td>
-        <% if (listado_consumo[i].estado=="abierto") { %>
-        <td><button type="button" class="btn btn-primary" onclick="window.location.href='/crear_detalle_consumo_tabla_cabecera/<%= listado_consumo[i].id %>'">Crear Consumo</button></td>
-        <td><button type="button" class="btn btn-secondary" onclick="window.location.href='/cerrar_consumo/<%= listado_consumo[i].id %>'">Cerrar Consumo</button></td>
-        <td><button type="button" class="btn btn-info" onclick="window.location.href='/cambiar_cliente_accion/<%= listado_consumo[i].id %>'">Cambiar cliente</button></td>
-        <% } %>
-        <td><button type="button" class="btn btn-success" onclick="window.location.href='/crear_ticket_pdf/<%= listado_consumo[i].id %>'">Ver ticket pdf</button></td>
-      </tr>
-    <% } %>
-    
-</table>
-<button type="button" class="btn btn-secondary" onclick="window.location.href='/mesa_list %>'">Ver mesas</button>
 
 
   <script>
