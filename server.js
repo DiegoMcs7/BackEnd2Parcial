@@ -319,21 +319,35 @@ app.get('/gestion-consumo/:mesaid', (req, res) => {
       const listado_consumo = await db.Cabecera.findAll({
         where: {
           id_mesa: req.params.mesaid,
-       }
+       },
+       include: [{
+        model: db.Cliente,
+        attributes: ['nombre']
+      },
+      {
+        model: db.Mesa,
+        attributes: ['nombre_mesa']
+      }
+    ]
       });
       const usersDataValues = listado_consumo.map(listado_consumo => listado_consumo.dataValues);
       return usersDataValues;
     }
     getCabecera().then(listado_consumo => {
-      const contador_cerrado =0;
-     // si el valor de  contador_cerrado es 1 entonces hay consumos no cerrados, por lo tanto no se puede crear un nuevo consumo
+      var contador_abierto =0;
+     // si el valor de  contador_cerrado es 1 si hay consumos abiertos, por lo tanto no se puede crear un nuevo consumo
       for (let i = 0; i < listado_consumo.length; i++) {
-        if (listado_consumo[i].estado === 'cerrado') {
-            contador_cerrado = 1;
+        if (listado_consumo[i].estado === 'abierto') {
+          contador_abierto =1;
+          console.log(contador_abierto);
+
         }
       }
+      
       console.log(req.params.mesaid);
-      res.render("gestion-consumo-mesas", { mesa: req.params.mesaid, listado_consumo: listado_consumo, contador_cerrado: contador_cerrado });
+      console.log(contador_abierto);
+
+      res.render("gestion-consumo-mesas", { mesa: req.params.mesaid, listado_consumo: listado_consumo, contador_abierto: contador_abierto });
     });
 });
 
@@ -357,7 +371,7 @@ app.post("/crear_cabecera_consumo", (req, res) => {
       .then((cabecera_last) => {
         console.log("Cabecera creada:", cabecera_last.id);
         // Puedes hacer lo que necesites con el ID aquí
-        res.render("gestion-detalle-mesas", { cabecera: cabecera_last.id, productos: productos });
+        res.render("gestion-detalle-mesas", { cabecera: cabecera_last.id, productos: productos, resultado: 0, mesa:req.body.mesa });
       })
       .catch((err) => {
         console.log("Error al crear la cabecera:", err.message);
@@ -369,20 +383,22 @@ app.post("/crear_cabecera_consumo", (req, res) => {
 app.post("/crear_detalle_consumo", (req, res) => {
   async function getCabecera() {
     const cabecera = await db.Cabecera.findByPk(req.body.cabecera);
-    const producto = await db.Producto.findByPk(req.body.producto);
-    return { cabecera, producto };
+    const producto = await db.Producto.findByPk(req.body.productos);
+    const productos_all = await db.Producto.findAll();
+
+    return { cabecera, producto, productos_all };
   }
 
   // Utilizando .then()
   getCabecera()
-    .then(({ cabecera, producto }) => {
+    .then(({ cabecera, producto, productos_all }) => {
       if (!cabecera) {
         // La cabecera no existe
         return res.status(404).json({ message: "Cabecera no encontrada" });
       }
 
       const detalle = {
-        id_producto: req.body.producto,
+        id_producto: req.body.productos,
         id_cabecera: req.body.cabecera,
         cantidad: req.body.cantidad,
       };
@@ -391,11 +407,32 @@ app.post("/crear_detalle_consumo", (req, res) => {
         .then((detalleCreado) => {
           // Aquí puedes realizar los cambios necesarios en la cabecera
           cabecera.total += detalle.cantidad * producto.precio;
-          console.log();          // Guardar los cambios en la base de datos
+
+          // Guardar los cambios en la base de datos
           cabecera
             .save()
             .then(() => {
-              res.json(detalleCreado); // Devolver el objeto de detalle creado
+
+              // Obtener todos los detalles con id_cabecera igual a req.body.cabecera
+              db.Detalle.findAll({
+                where: {
+                  id_cabecera: req.body.cabecera,
+                },
+                include: [{
+                  model: db.Producto,
+                  attributes: ['nombre_producto']
+                }],
+              })
+                .then((detalles) => {
+                  console.log(detalles);
+ 
+                  res.render("gestion-detalle-mesas", { detalles: detalles, cabecera: req.body.cabecera, productos: productos_all, resultado: 1, mesa:cabecera.id_mesa });
+                  // Devolver el objeto de detalle creado junto con los detalles obtenidos
+                })
+                .catch((err) => {
+                  console.log("Error al obtener los detalles:", err.message);
+                  res.status(400).json({ message: err.message });
+                });
             });
         })
         .catch((err) => {
@@ -408,6 +445,78 @@ app.post("/crear_detalle_consumo", (req, res) => {
       res.status(400).json({ message: err.message });
     });
 });
+
+
+
+
+app.get("/crear_detalle_consumo_tabla_cabecera/:cabeceraid", (req, res) => {
+  async function getCabecera() {
+    const cabecera = await db.Cabecera.findByPk(req.params.cabeceraid);
+    const productos_all = await db.Producto.findAll();
+
+    return { cabecera, productos_all };
+  }
+
+  // Utilizando .then()
+  getCabecera()
+    .then(({ cabecera, productos_all }) => {
+      if (!cabecera) {
+        // La cabecera no existe
+        return res.status(404).json({ message: "Cabecera no encontrada" });
+      }
+
+      db.Detalle.findAll({
+        where: {
+          id_cabecera: req.params.cabeceraid,
+        },
+        include: [{
+          model: db.Producto,
+          attributes: ['nombre_producto']
+        }],
+      })
+        .then((detalles) => {
+          res.render("gestion-detalle-mesas", { detalles: detalles, cabecera: req.params.cabeceraid, productos: productos_all, resultado: 1, mesa:cabecera.id_mesa });
+        })
+        .catch((err) => {
+          console.log("Error al obtener los detalles:", err.message);
+          res.status(400).json({ message: err.message });
+        });
+    })
+    .catch((err) => {
+      console.log("Error al obtener la cabecera:", err.message);
+      res.status(400).json({ message: err.message });
+    });
+});
+
+
+
+
+app.get("/cerrar_consumo/:cabeceraid", (req, res) => {
+  async function getCabecera() {
+    const cabecera = await db.Cabecera.findByPk(req.params.cabeceraid);
+    if (!cabecera) {
+      return res.status(404).json({ message: "Cabecera no encontrada" });
+    }
+
+    cabecera.estado = "cerrado"; // Actualizar el estado de la cabecera
+    cabecera.fecha_cierre = Date.now(); // Establecer la fecha de cierre como la fecha actual
+
+    cabecera.save()
+      .then(() => {
+        res.redirect("/gestion-consumo/" + cabecera.id_mesa);
+      })
+      .catch((err) => {
+        console.log("Error al cerrar el consumo:", err.message);
+        res.status(400).json({ message: err.message });
+      });
+  }
+
+  getCabecera().catch((err) => {
+    console.log("Error al obtener la cabecera:", err.message);
+    res.status(400).json({ message: err.message });
+  });
+});
+
 
 
 

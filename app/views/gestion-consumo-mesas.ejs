@@ -28,6 +28,9 @@
 </head>
 
 <body style="margin-left: 1vw; margin-top: 1vh;">
+
+<% if (contador_abierto!=1) { %>
+
   <h1>Seleccione el cliente</h1>
  
   <br>
@@ -87,6 +90,37 @@
       <p style="margin-top: 3vh;"class="btn btn-secondary" onclick="window.history.back()">Atrás</p>
 
   </form>
+  <% } %>
+
+  
+  <body>
+    <h1>Registro de cabeceras</h1>
+    <table align="left" border="4">
+    <tr> 
+        <th>Cliente</th>
+        <th>Mesa</th>
+        <th>Total</th>
+        <th>Estado</th>
+        <th>Fecha creación</th>  
+        <th>Fecha cierre</th>  
+
+      </tr>
+    <% for(let i = 0; i < listado_consumo.length; i++) { %>
+    <tr>
+        <td><%= listado_consumo[i].Cliente.nombre %></td>
+        <td><%= listado_consumo[i].Mesa.nombre_mesa %></td>
+        <td><%= listado_consumo[i].total %></td>
+        <td><%= listado_consumo[i].estado %></td>
+        <td><%= listado_consumo[i].fecha_creacion %></td>
+        <td><%= listado_consumo[i].fecha_cierre %></td>
+        <td><button type="button" class="btn btn-primary" onclick="window.location.href='/crear_detalle_consumo_tabla_cabecera/<%= listado_consumo[i].id %>'">Crear Consumo</button></td>
+        <td><button type="button" class="btn btn-secondary" onclick="window.location.href='/cerrar_consumo/<%= listado_consumo[i].id %>'">Cerrar Consumo</button></td>
+        <td><button type="button" class="btn btn-success" onclick="window.location.href='/crear_ticket_pdf/<%= listado_consumo[i].id %>'">Cerrar ticket pdf</button></td>
+
+    </tr>
+    <% } %>
+    
+</table>
 
 
   <script>

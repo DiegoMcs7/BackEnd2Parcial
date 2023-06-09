@@ -53,63 +53,30 @@
     <input type="hidden" id="cabecera" name="cabecera" value="<%= cabecera %>">
     <br>
     <input type="submit" value="Agregar producto" class="btn btn-primary">
-    <p style="margin-top: 3vh;"class="btn btn-secondary" onclick="window.history.back()">Atrás</p>
+    <button type="button" class="btn btn-secondary" onclick="window.location.href='/gestion-consumo/<%= mesa %>'">Atras</button>
 
   </form>
-  
-<div id="resultado">
 
-  <table align="left" border="4">
-    <tr> 
-        <th>PRODUCTO</th>
-        <th>CANTIDAD</th> 
-    </tr>
-    <% for(let i = 0; i < detalleCreado.length; i++) { %>
-    <tr>
-        <td><%= detalleCreado[i].id_producto.nombre_producto %></td>
-        <td><%= detalleCreado[i].cantidad %></td>
-    </tr>
+  <div id="resultado">
+    <% if (resultado==1) { %>
+
+    <table align="left" border="4">
+      <tr> 
+          <th>NOMBRE DEL PRODUCTO</th>
+          <th>CANTIDAD</th> 
+      </tr>
+      <% for(let i = 0; i < detalles.length; i++) { %>
+      <tr>
+        <td><%= detalles[i].Producto.nombre_producto %></td>
+        <td><%= detalles[i].cantidad %></td>
+      </tr>
+      <% } %>
+      
+    </table>
+
     <% } %>
-    
-</table>
 
-</div>
-
-<script>
-   $(document).ready(function() {
-  // Capturar el evento de envío del formulario
-  $('#form_post').submit(function(event) {
-    event.preventDefault(); // Prevenir el comportamiento predeterminado del formulario
-
-    // Obtener los datos del formulario
-    const productoId = $('#productos').val();
-    const cantidad = $('#cantidad').val();
-    const cabeceraId = $('#cabecera').val();
-
-    // Crear el objeto de datos a enviar
-    const datos = {
-      producto: productoId,
-      cantidad: cantidad,
-      cabecera: cabeceraId
-    };
-
-    // Realizar la petición AJAX
-    $.ajax({
-      url: '/crear_detalle_consumo',
-      method: 'POST',
-      data: datos,
-      success: function(response) {
-        // Actualizar el contenido del resultado con la respuesta recibida
-        $('#resultado').html(response);
-      },
-      error: function(xhr, status, error) {
-        console.log(error);
-      }
-    });
-  });
-});
-
-</script>
+  </div>
 
 </body>
 </html>
