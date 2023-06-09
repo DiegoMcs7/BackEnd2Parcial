@@ -520,6 +520,47 @@ app.get("/cerrar_consumo/:cabeceraid", (req, res) => {
 
 
 
+app.get("/crear_ticket_pdf/:cabeceraid", (req, res) => {
+  async function getCabecera() {
+    const cabecera = await db.Cabecera.findByPk(req.params.cabeceraid);
+    if (!cabecera) {
+      return res.status(404).json({ message: "Cabecera no encontrada" });
+    }
+
+    const detalles = await db.Detalle.findAll({
+      where: {
+        id_cabecera: req.params.cabeceraid
+      },
+      include: [db.Producto]
+    });
+
+    if (!detalles) {
+      return res.status(404).json({ message: "Detalles no encontrados" });
+    }
+
+    cabecera.save()
+      .then(() => {
+        // Aquí puedes utilizar los detalles y generar el PDF
+        // ...
+        res.redirect("/gestion-consumo/" + cabecera.id_mesa);
+      })
+      .catch((err) => {
+        console.log("Error al cerrar el consumo:", err.message);
+        res.status(400).json({ message: err.message });
+      });
+  }
+
+  getCabecera().catch((err) => {
+    console.log("Error al obtener la cabecera:", err.message);
+    res.status(400).json({ message: err.message });
+  });
+});
+
+
+
+
+
+
 require("./app/routes/restaurante.routes")(app);
 require("./app/routes/mesa.routes")(app);
 require("./app/routes/cliente.routes")(app);
